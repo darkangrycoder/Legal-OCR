@@ -187,13 +187,23 @@ curl -O https://legal-ocr-1.onrender.com/results/<uuid>_output.json
 
 ```
 legal-ocr/
-├── app.py
-├── Dockerfile
-├── requirements.txt
-├── packages.txt
-├── uploads/    # auto-generated
-├── results/    # auto-generated
-└── README.md
+├── LICENSE                                # Project license (MIT)
+├── README.md                              # Project documentation and instructions
+├── app-py                                 # Flask app for POST API (should be renamed to app.py)
+├── api_run.py                             # Example script to call the API with any PDF
+├── main_ocr.py                            # Core OCR and extraction pipeline
+├── requirements.txt                       # Python dependencies
+├── RFD.pdf                                # Sample testing PDF file
+├── D SLT Correspondance .pdf              # Sample testing PDF file
+├── output_RLTjson/                        # Folder with JSON output for RLT.pdf
+│   └── ...                               
+├── output_SLl_correspondence.json         # JSON output of SLT Correspondence PDF
+└── .gitignore                             # Git ignore rules
+
+Generated at runtime (not committed):
+
+- `uploads/`  — saved uploaded PDFs
+- `results/`  — saved JSON outputs from the API
 ```
 
 ---
