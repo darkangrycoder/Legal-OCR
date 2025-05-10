@@ -2,7 +2,7 @@ import os
 import uuid
 import json
 import traceback
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from gradio_client import Client, handle_file
 
@@ -44,7 +44,6 @@ def ingest():
 
         # 2. Call Hugging Face Space via Gradio Client
         print(f"[INFO] Calling HF Space with: {saved_pdf}")
-        assert os.path.exists(saved_pdf)
         result = hf_client.predict(
             file_obj=handle_file(saved_pdf),
             api_name=PREDICT_API
@@ -55,10 +54,14 @@ def ingest():
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
-        # 4. Return response
+        # 4. Return response with full payload & download URL
+        filename_json = os.path.basename(json_path)
+        download_url = f"{request.url_root}results/{filename_json}"
         return jsonify({
             "message": "Success",
-            "saved_json_path": json_path
+            "saved_json_path": json_path,
+            "download_url": download_url,
+            "result": result
         }), 200
 
     except Exception as e:
@@ -67,6 +70,11 @@ def ingest():
         return jsonify({
             "error": f"Internal server error: {str(e)}"
         }), 500
+
+# === Download Endpoint ===
+@app.route("/results/<path:filename>", methods=["GET"])
+def download_result(filename):
+    return send_from_directory(RESULTS_DIR, filename, as_attachment=True)
 
 # === Server entrypoint ===
 if __name__ == "__main__":
